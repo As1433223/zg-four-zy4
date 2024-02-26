@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	ServerRpc_UserLogin_FullMethodName = "/proto.ServerRpc/UserLogin"
 	ServerRpc_EsIkIndex_FullMethodName = "/proto.ServerRpc/EsIkIndex"
+	ServerRpc_Index_FullMethodName     = "/proto.ServerRpc/Index"
 )
 
 // ServerRpcClient is the client API for ServerRpc service.
@@ -31,6 +32,8 @@ type ServerRpcClient interface {
 	UserLogin(ctx context.Context, in *UserLoginReq, opts ...grpc.CallOption) (*UserLoginRes, error)
 	// todo: esIK分词器索引
 	EsIkIndex(ctx context.Context, in *EsIkIndexReq, opts ...grpc.CallOption) (*EsIkIndexRes, error)
+	// todo: 测试
+	Index(ctx context.Context, in *IndexReq, opts ...grpc.CallOption) (*IkIndexRes, error)
 }
 
 type serverRpcClient struct {
@@ -59,6 +62,15 @@ func (c *serverRpcClient) EsIkIndex(ctx context.Context, in *EsIkIndexReq, opts 
 	return out, nil
 }
 
+func (c *serverRpcClient) Index(ctx context.Context, in *IndexReq, opts ...grpc.CallOption) (*IkIndexRes, error) {
+	out := new(IkIndexRes)
+	err := c.cc.Invoke(ctx, ServerRpc_Index_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServerRpcServer is the server API for ServerRpc service.
 // All implementations must embed UnimplementedServerRpcServer
 // for forward compatibility
@@ -67,6 +79,8 @@ type ServerRpcServer interface {
 	UserLogin(context.Context, *UserLoginReq) (*UserLoginRes, error)
 	// todo: esIK分词器索引
 	EsIkIndex(context.Context, *EsIkIndexReq) (*EsIkIndexRes, error)
+	// todo: 测试
+	Index(context.Context, *IndexReq) (*IkIndexRes, error)
 	mustEmbedUnimplementedServerRpcServer()
 }
 
@@ -79,6 +93,9 @@ func (UnimplementedServerRpcServer) UserLogin(context.Context, *UserLoginReq) (*
 }
 func (UnimplementedServerRpcServer) EsIkIndex(context.Context, *EsIkIndexReq) (*EsIkIndexRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EsIkIndex not implemented")
+}
+func (UnimplementedServerRpcServer) Index(context.Context, *IndexReq) (*IkIndexRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Index not implemented")
 }
 func (UnimplementedServerRpcServer) mustEmbedUnimplementedServerRpcServer() {}
 
@@ -129,6 +146,24 @@ func _ServerRpc_EsIkIndex_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ServerRpc_Index_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IndexReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerRpcServer).Index(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ServerRpc_Index_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerRpcServer).Index(ctx, req.(*IndexReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ServerRpc_ServiceDesc is the grpc.ServiceDesc for ServerRpc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -143,6 +178,10 @@ var ServerRpc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EsIkIndex",
 			Handler:    _ServerRpc_EsIkIndex_Handler,
+		},
+		{
+			MethodName: "Index",
+			Handler:    _ServerRpc_Index_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
