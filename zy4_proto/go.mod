@@ -1,4 +1,4 @@
-module github.com/As1433223/zg-four-zy4
+module github.com/As1433223/zg-four-zy4/tree/main
 
 go 1.21
 
