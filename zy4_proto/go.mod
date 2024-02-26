@@ -1,4 +1,4 @@
-module zy4_proto
+module github.com/As1433223/zg-four-zy4
 
 go 1.21
 
